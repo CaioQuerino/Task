@@ -28,12 +28,12 @@ public class Address {
     private String state;
     private String city;
     private String complement;
-    private int number;
+    private Integer number;
 
     public Address() {}
     
     public Address(String zipCode, String neighborhood, String road, 
-            String state, String city, String complement, int number) 
+            String state, String city, String complement, Integer number) 
     {
         this.zipCode = zipCode;
         this.neighborhood = neighborhood;
@@ -44,11 +44,11 @@ public class Address {
         this.road = road;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -92,16 +92,20 @@ public class Address {
         this.complement = complement;
     }
 
-    public int getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(Integer number) {
         this.number = number;
     }
     
     public void setNumber(String number) {
-        this.number = Integer.parseInt(number);
+        try {
+            this.number = Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            this.number = null;
+        }
     }  
     
     public String getRoad() {
@@ -110,5 +114,18 @@ public class Address {
     
     public void setRoad(String road) {
         this.road = road;
+    }
+    
+    @Override
+    public String toString() {
+        return "Address{" +
+                "zipCode='" + zipCode + '\'' +
+                ", neighborhood='" + neighborhood + '\'' +
+                ", road='" + road + '\'' +
+                ", city='" + city + '\'' +
+                ", state='" + state + '\'' +
+                ", complement='" + complement + '\'' +
+                ", number=" + number +
+                '}';
     }
 }
