@@ -4,13 +4,17 @@
 
 package com.r2m.praticar.taskapplication;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 /**
  *
  * @author caioq
  */
+@SpringBootApplication
 public class TaskApplication {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        SpringApplication.run(TaskApplication.class, args);
     }
 }

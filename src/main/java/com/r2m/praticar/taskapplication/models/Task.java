@@ -10,6 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.util.UUID;
+
 /**
  *
  * @author caioq
@@ -19,8 +21,8 @@ import jakarta.persistence.Table;
 @Table(name = "tasks")
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     
     private String title;
     private String description;
@@ -34,14 +36,23 @@ public class Task {
         this.completad = completad;
     }
     
-    public Long getId() {
+    public UUID getId() {
         return this.id;
     }
     
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
-    
+
+    public void setId(String id) {
+        try {
+            this.id = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("ID inválido: " + id + ". "
+                                             + "Formato esperado: UUID.");
+        }
+    }
+
     public String getTitle() {
         return this.title;
     }

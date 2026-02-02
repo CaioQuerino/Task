@@ -8,9 +8,13 @@ import com.r2m.praticar.taskapplication.Enums.Gender;
 import com.r2m.praticar.taskapplication.Enums.UserRole;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import java.util.UUID;
@@ -24,12 +28,17 @@ import java.util.UUID;
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    
     private String name;
     private String email;
     private UserRole role;
     private String password;
     private boolean action;
+    
+    @OneToOne
     private Address address;
     private String telephone;
     private Gender gender;

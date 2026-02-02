@@ -16,5 +16,5 @@ public record RequestAddressDTO (
     String state, 
     String city, 
     String complement, 
-    int number        
+    Integer number        
 ) {}

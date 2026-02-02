@@ -6,6 +6,7 @@ package com.r2m.praticar.taskapplication.dto;
 
 import  com.r2m.praticar.taskapplication.models.User;
 
+import java.util.UUID;
 
 /**
  *
@@ -15,6 +16,6 @@ public record RequestTaskDTO (
         String title, 
         String description, 
         boolean completad,
-        Long id,
+        UUID id,
         User user
 ) {}
