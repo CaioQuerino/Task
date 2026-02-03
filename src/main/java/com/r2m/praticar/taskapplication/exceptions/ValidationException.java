@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class ValidationException extends BusinessException {
     private static HttpStatus status;
-
+    
     public ValidationException(String message) {
         super(message, status);
     }
