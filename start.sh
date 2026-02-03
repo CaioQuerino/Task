@@ -1,5 +1,7 @@
+mvn clean
+
+docker-compose down -v
+
 mvn clean compile
 
-docker-compose down
-
-docker-compose up
+docker-compose up --build

@@ -144,8 +144,8 @@ public abstract class User {
     public void setTask(Task task) {
         this.task = task;
     }
-    
-    public void register(User user) {
-        
-    }
+
+    public void registerUser(User user) {}
+
+    public void alterUser(User user) {}
 }
