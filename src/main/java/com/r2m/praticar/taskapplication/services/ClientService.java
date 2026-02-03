@@ -10,6 +10,7 @@ import com.r2m.praticar.taskapplication.exceptions.ExternalServiceException;
 import com.r2m.praticar.taskapplication.exceptions.ValidationException;
 import com.r2m.praticar.taskapplication.models.Address;
 import com.r2m.praticar.taskapplication.models.Client;
+import com.r2m.praticar.taskapplication.repositories.AddressRepository;
 import com.r2m.praticar.taskapplication.repositories.ClientRepository;
 
 import org.springframework.dao.DataAccessException;
@@ -21,27 +22,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ClientService {
     private final ClientRepository clientRepository;
+    private final AddressRepository addressRepository;
     private final SecurityConfig securityConfig;
     private final AddressService addressService;
     
     private static final String CLIENT_ALREADY_EXISTS = "Já existe um cliente cadastrado com o email: ";
-
-    @SuppressWarnings("unused")
-    private static final String INVALID_REQUEST = "Dados de requisição inválidos";
-    
     private static final String ADDRESS_SERVICE_ERROR = "Erro ao consultar serviço de endereço";
     private static final String DATABASE_ERROR = "Erro ao persistir dados do cliente";
     private static final String VALIDATION_ERROR = "Erro de validação: ";
-    
     private static final String CLIENT_REGISTERED_SUCCESS = "Cliente cadastrado com sucesso";
     private static final String CLIENT_ACTIVATED_SUCCESS = "Cliente ativado com sucesso";
 
     public ClientService(ClientRepository clientRepository, 
                         AddressService addressService,
-                        SecurityConfig securityConfig) {
+                        SecurityConfig securityConfig,
+                        AddressRepository addressRepository) {
         this.clientRepository = clientRepository;
         this.addressService = addressService;
         this.securityConfig = securityConfig;
+        this.addressRepository = addressRepository;
     }
 
     @Transactional
@@ -51,9 +50,16 @@ public class ClientService {
             
             checkIfClientExists(request.email());
             
+            Address address = fetchAddress(request.zipCode());
+
+            address.setNumber(request.number());
+
+            address.setComplement(request.complement());
+            
+            address = addressRepository.save(address);
+            
             Client client = createClientFromRequest(request);
             
-            Address address = fetchAddress(request.zipCode());
             client.setAddress(address);
             
             saveClient(client);
@@ -151,9 +157,9 @@ public class ClientService {
         }
     }
 
-    @SuppressWarnings("null")
     public ResponseEntity<ApiResponse> getClientById(UUID clientId) {
         try {
+            @SuppressWarnings("null")
             Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new BusinessException("Cliente não encontrado", null));
             
@@ -219,7 +225,7 @@ public class ClientService {
     }
 
     private void checkIfClientExists(String email) {
-        boolean exists = clientRepository.findByEmail(email);
+        boolean exists = clientRepository.existsByEmail(email);
         if (exists) {
             throw new BusinessException(CLIENT_ALREADY_EXISTS + email, null);
         }
@@ -238,8 +244,6 @@ public class ClientService {
         
         return client;
     }
-
-    
 
     private Address fetchAddress(String zipCode) {
         try {
