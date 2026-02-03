@@ -8,5 +8,7 @@ public record RegisterRequestClientDTO(
     String password, 
     String telephone,                                     
     Gender gender,
-    String zipCode 
+    String zipCode,
+    Integer number,
+    String complement
 ) {}
