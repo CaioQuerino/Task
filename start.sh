@@ -1,9 +1,7 @@
-# Pare e remova containers antigos
-docker-compose down
-docker system prune -a
+mvn clean
 
-# Reconstrua
-docker-compose build --no-cache
+docker-compose down -v
 
-# Suba os serviços
-docker-compose up
+mvn clean compile
+
+docker-compose up --build
