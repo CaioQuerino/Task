@@ -59,6 +59,8 @@ public class ClientService {
             address = addressRepository.save(address);
             
             Client client = createClientFromRequest(request);
+
+            client.setGender(request.gender());
             
             client.setAddress(address);
             
@@ -107,6 +109,58 @@ public class ClientService {
             ApiResponse response = new ApiResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Erro interno do servidor: " + e.getMessage(),
+                null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @SuppressWarnings("null")
+    @Transactional
+    public ResponseEntity<ApiResponse> deleteUser(UUID id) {
+        try {
+            if (!clientRepository.existsById(id)) {
+                throw new BusinessException("Cliente não encontrado para exclusão", HttpStatus.NOT_FOUND);
+            }
+            
+            Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Cliente não encontrado", HttpStatus.NOT_FOUND));
+            
+            if (client.isAction()) {
+                throw new BusinessException("Não é possível excluir um cliente ativo. Desative-o primeiro.", 
+                                        HttpStatus.CONFLICT);
+            }
+            
+            clientRepository.deleteById(id);
+            
+            ApiResponse response = new ApiResponse(
+                HttpStatus.OK.value(),
+                "Cliente excluído com sucesso",
+                id
+            );
+            return ResponseEntity.ok(response);
+            
+        } catch (BusinessException e) {
+            ApiResponse response = new ApiResponse(
+                e.getStatus() != null ? e.getStatus().value() : HttpStatus.BAD_REQUEST.value(),
+                e.getMessage(),
+                null
+            );
+            return ResponseEntity.status(e.getStatus() != null ? e.getStatus() : HttpStatus.BAD_REQUEST)
+                            .body(response);
+            
+        } catch (DataAccessException e) {
+            ApiResponse response = new ApiResponse(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Erro ao acessar banco de dados: " + e.getMessage(),
+                null
+            );
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+            
+        } catch (Exception e) {
+            ApiResponse response = new ApiResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Erro interno ao excluir cliente: " + e.getMessage(),
                 null
             );
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
