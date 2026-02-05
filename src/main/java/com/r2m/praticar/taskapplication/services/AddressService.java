@@ -112,7 +112,6 @@ public class AddressService {
                 throw new NullPointerException("Erro: Id do endereço não pode ser nulo.");
             }
 
-            @SuppressWarnings("null")
             Address address = addressRepository.findById(request.id())
                     .orElseThrow(() -> new RuntimeException("Erro: Endereço não encontrado."));
 
