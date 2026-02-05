@@ -8,10 +8,10 @@ package com.r2m.praticar.taskapplication.services;
 import com.r2m.praticar.taskapplication.dto.RequestTaskDTO;
 import com.r2m.praticar.taskapplication.models.Task;
 import com.r2m.praticar.taskapplication.repositories.TaskRepository;
-import java.util.List;
-
-
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -25,31 +25,34 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public void addTask(RequestTaskDTO request) {
+    public Task addTask(RequestTaskDTO request) {
         try {
-            if (request.user() == null || request.user().getId() == null) {
-                throw new NullPointerException("Erro: Id do usuário nulo.");
-            }
             if (request.title() == null || request.title().isBlank()) {
-                throw new NullPointerException("Erro: Título não pode ser nulo.");
+                throw new IllegalArgumentException("Erro: Título não pode ser nulo.");
             }
             if (request.description() == null || request.description().isBlank()) {
-                throw new NullPointerException("Erro: Descrição não pode ser nula.");
+                throw new IllegalArgumentException("Erro: Descrição não pode ser nula.");
             }
 
-            Task task = new Task(
-                request.title(),
-                request.description(),
-                request.completad()
-            );
+            Task task = new Task();
+            task.setTitle(request.title());
+            task.setDescription(request.description());
+            task.setCompletad(request.completad());
+            
+            if (request.user() != null) {
+                task.setUser(request.user());
+            }
 
-            taskRepository.save(task);
-            IO.println("Tarefa salva com sucesso!");
+            Task savedTask = taskRepository.save(task);
+            IO.println("Tarefa salva com sucesso! ID: " + savedTask.getId());
+            return savedTask;
 
-        } catch (NullPointerException e) {
-           IO.println("Erro: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            IO.println("Erro de validação: " + e.getMessage());
+            throw e;
         } catch (Exception e) {
-           IO.println("Ocorreu um erro inesperado: " + e.getMessage());
+            IO.println("Ocorreu um erro inesperado: " + e.getMessage());
+            throw new RuntimeException("Erro ao criar tarefa: " + e.getMessage());
         }
     }
     
@@ -57,20 +60,16 @@ public class TaskService {
         try {
             return taskRepository.findAll();
         } catch (Exception e) {
-           IO.println("Erro ao listar tarefas: " + e.getMessage());
-            return List.of();
+            IO.println("Erro ao listar tarefas: " + e.getMessage());
+            throw new RuntimeException("Erro ao listar tarefas: " + e.getMessage());
         }
-    } 
+    }
     
     @SuppressWarnings("null")
     public void alterTask(RequestTaskDTO request) {
         try {
             if (request.id() == null) {
-                throw new NullPointerException("Erro: Id da tarefa não pode ser nulo.");
-            }
-
-            if (!taskRepository.existsById(request.id())) {
-                throw new RuntimeException("Erro: Id não existe.");
+                throw new IllegalArgumentException("Erro: Id da tarefa não pode ser nulo.");
             }
 
             Task task = taskRepository.findById(request.id())
@@ -85,37 +84,49 @@ public class TaskService {
             task.setCompletad(request.completad());
 
             taskRepository.save(task);
-            IO.println("Tarefa atualizada com sucesso!");
+            IO.println("Tarefa atualizada com sucesso! ID: " + task.getId());
 
-        } catch (NullPointerException e) {
-           IO.println("Erro: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            IO.println("Erro de validação: " + e.getMessage());
+            throw e;
         } catch (RuntimeException e) {
-           IO.println("Erro: " + e.getMessage());
+            IO.println("Erro: " + e.getMessage());
+            throw e;
         } catch (Exception e) {
-           IO.println("Ocorreu um erro inesperado: " + e.getMessage());
+            IO.println("Ocorreu um erro inesperado: " + e.getMessage());
+            throw new RuntimeException("Erro ao atualizar tarefa: " + e.getMessage());
         }
     }
     
     @SuppressWarnings("null")
     public void deleteTask(RequestTaskDTO request) {
-       try {
-           if (request.id() == null) {
-               throw new NullPointerException("Erro: Id da tarefa não pode ser nulo.");
-           }
+        try {
+            if (request.id() == null) {
+                throw new IllegalArgumentException("Erro: Id da tarefa não pode ser nulo.");
+            }
 
-           if (!taskRepository.existsById(request.id())) {
-               throw new RuntimeException("Erro: Id não existe.");
-           }
+            if (!taskRepository.existsById(request.id())) {
+                throw new RuntimeException("Erro: Tarefa não existe.");
+            }
 
-           taskRepository.deleteById(request.id());
-           IO.println("Tarefa deletada com sucesso. Id: " + request.id());
+            taskRepository.deleteById(request.id());
+            IO.println("Tarefa deletada com sucesso. Id: " + request.id());
 
-       } catch (NullPointerException e) {
-           IO.println("Erro: " + e.getMessage());
-       } catch (RuntimeException e) {
-           IO.println("Erro: " + e.getMessage());
-       } catch (Exception e) {
-           IO.println("Ocorreu um erro inesperado: " + e.getMessage());
-       }
-   }
+        } catch (IllegalArgumentException e) {
+            IO.println("Erro de validação: " + e.getMessage());
+            throw e;
+        } catch (RuntimeException e) {
+            IO.println("Erro: " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            IO.println("Ocorreu um erro inesperado: " + e.getMessage());
+            throw new RuntimeException("Erro ao deletar tarefa: " + e.getMessage());
+        }
+    }
+    
+    @SuppressWarnings("null")
+    public Task getTaskById(UUID id) {
+        return taskRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
+    }
 }

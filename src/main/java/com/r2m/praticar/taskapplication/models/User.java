@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -43,6 +44,7 @@ public abstract class User {
     private String telephone;
     private Gender gender;
     
+    @JoinColumn(name = "task_id")
     @ManyToOne
     private Task task;
     

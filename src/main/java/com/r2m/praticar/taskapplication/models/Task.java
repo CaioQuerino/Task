@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.util.UUID;
@@ -27,15 +29,26 @@ public class Task {
     private String title;
     private String description;
     private boolean completad;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     
     public Task() {}
 
-    public Task(String title, String description, boolean completad) {
+    public Task(UUID id, String title, String description, boolean completad) {
+        this.id = UUID.randomUUID();
         this.title = title;
         this.description = description;
         this.completad = completad;
     }
     
+    public Task(String title, String description, boolean completad) {
+        this.title = title;
+        this.description = description;
+        this.completad = completad;
+    }
+
     public UUID getId() {
         return this.id;
     }
@@ -75,5 +88,13 @@ public class Task {
     
     public void setCompletad(boolean completad) {
         this.completad = completad;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
